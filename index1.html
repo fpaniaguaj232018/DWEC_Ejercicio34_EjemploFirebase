@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ejemplo Firebase</title>
+    <script>
+    var database;
+    function inicializar(){
+          var config = {
+            apiKey: "AIzaSyByzGFoM-jbbOUL5gN2-gjVWIDIRCW2514",
+            authDomain: "pruebajsfpa.firebaseapp.com",
+            databaseURL: "https://pruebajsfpa.firebaseio.com/",
+            storageBucket: "bucket.appspot.com"
+        };
+        firebase.initializeApp(config);
+        // Get a reference to the database service
+        database = firebase.database();
+
+        //Nos suscribimos a la rama de las películas
+        var refPeliculas = database.ref("/peliculas");
+        refPeliculas.on('value', function(snapshot){
+            //Procesamos
+            snapshot.forEach(function(childSnapShot) {
+                console.log(childSnapShot.val().director);
+                console.log(childSnapShot.val().titulo);
+            });
+        });
+
+
+    }
+    function cambiar(){
+        var telefono = document.getElementById("telefono").value;
+        console.log("Cambiando");
+        database.ref('/cine/').set({
+            nombre: 'kinepolis',
+            telefono: telefono,
+            direccion: 'Calle Mayor, 58'
+        });
+        database.ref('/cine/nombre').set('Benares');
+    }
+    function insertar(){
+        var claveAleatoria = database.ref().child('peliculas').push().key;//Crea el elemento y devuelve la key
+        database.ref("/peliculas/"+claveAleatoria).set({
+            titulo: 'Glass',
+            director: 'Manolo el del bombo'
+        });
+    }
+    function leerUno(){
+        database.ref('/cine/nombre').once('value').then(function(snapshot) {
+            console.log(snapshot.val());
+        });
+    }
+    </script>
+</head>
+<body onload="inicializar()">
+        <input type="text" id="telefono" placeholder="Teléfono">
+        <input type="button" value="Cambiar" onclick="cambiar()">
+        <input type="button" value="Leer uno" onclick="leerUno()">
+        <input type="button" value="Insertar" onclick="insertar()">
+</body>
+
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-database.js"></script>
+</html>
